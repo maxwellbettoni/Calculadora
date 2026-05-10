@@ -1,91 +1,497 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Custos - MAX 3D STUDIO</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Custos - MAX 3D STUDIO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --surface2: #181c24;
+      --border: #2a3040;
+      --accent: #00d4ff;
+      --accent2: #ff6b00;
+      --green: #00e676;
+      --text: #e8eaf0;
+      --muted: #6b7694;
+      --glow: 0 0 18px rgba(0,212,255,0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(0,212,255,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, rgba(255,107,0,0.05) 0%, transparent 60%);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header .logo {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(0,212,255,0.5);
+    }
+
+    header .subtitle {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
+    .divider-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      margin: 12px auto;
+      max-width: 400px;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.5;
+    }
+
+    .card-title {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .icon { font-size: 1rem; }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .grid2 { grid-template-columns: 1fr; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    input[type="number"] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+
+    /* ── DIVISÃO DE PRODUTOS ── */
+    .products-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .product-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 36px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    @media (max-width: 480px) {
+      .product-row { grid-template-columns: 1fr 90px 36px; }
+    }
+
+    .product-row label {
+      font-size: 0.65rem;
+    }
+
+    .btn-remove {
+      background: transparent;
+      border: 1px solid #3a2020;
+      border-radius: 8px;
+      color: #ff4444;
+      font-size: 1.1rem;
+      cursor: pointer;
+      height: 40px;
+      transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .btn-remove:hover { background: rgba(255,68,68,0.12); }
+
+    .btn-add {
+      background: transparent;
+      border: 1px dashed var(--accent);
+      border-radius: 8px;
+      color: var(--accent);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      padding: 9px 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-add:hover { background: rgba(0,212,255,0.08); }
+
+    .split-info {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 6px;
+    }
+
+    .split-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    .split-info-row:last-child { border-bottom: none; }
+
+    .split-info-row .pname { color: var(--muted); }
+
+    .split-info-row .pval {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--accent);
+      font-size: 0.85rem;
+    }
+
+    /* ── RESULTADO ── */
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .results { grid-template-columns: 1fr; }
+    }
+
+    .result-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .result-box.highlight {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+
+    .result-label {
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .result-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.3rem;
+      color: var(--text);
+    }
+
+    .result-box.highlight .result-value { color: var(--accent); }
+    .result-box.profit .result-value { color: var(--green); }
+
+    .footer-tag {
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="background-animation"></div>
-    <div class="container">
-        <header>
-            <h1>MAX 3D STUDIO</h1>
-            <p>Calculadora de Precificação Premium - Bambu Lab A1</p>
-        </header>
 
-        <main>
-            <section class="calculator-panel glass-panel">
-                <form id="calc-form">
-                    <h3 class="section-title"
-                        style="margin-bottom: 1rem; color: var(--primary); font-size: 1.1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">
-                        📦 Dados da Impressão</h3>
-                    <div class="input-group">
-                        <label for="peso">Peso da Peça (g)</label>
-                        <input type="number" id="peso" value="50" min="0" step="1" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="tempo">Tempo de Impressão (Horas)</label>
-                        <input type="number" id="tempo" value="2" min="0" step="0.1" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="precoFilamento">Preço do Filamento (R$/kg)</label>
-                        <input type="number" id="precoFilamento" value="120" min="0" step="0.01" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="acessorios">Acessórios/Embalagem (R$)</label>
-                        <input type="number" id="acessorios" value="2.00" min="0" step="0.01" required>
-                    </div>
-                    <hr>
-                    <h3 class="section-title"
-                        style="margin-bottom: 1rem; color: var(--primary); font-size: 1.1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem;">
-                        ⚙️ Parâmetros Operacionais</h3>
-                    <div class="input-group">
-                        <label for="custoHora">Custo Hora Impressora (R$/h)</label>
-                        <input type="number" id="custoHora" value="1.50" min="0" step="0.1" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="watts">Consumo Energia (Watts)</label>
-                        <input type="number" id="watts" value="150" min="0" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="taxaKwh">Taxa de Energia (R$/kWh)</label>
-                        <input type="number" id="taxaKwh" value="0.85" min="0" step="0.01" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="lucro">Margem de Lucro (%)</label>
-                        <input type="number" id="lucro" value="100" min="0" required>
-                    </div>
-                </form>
-            </section>
+<header>
+  <div class="logo">MAX 3D STUDIO</div>
+  <div class="subtitle">CALCULADORA DE PRECIFICAÇÃO PREMIUM · BAMBU LAB A1</div>
+  <div class="divider-line"></div>
+</header>
 
-            <section class="results-panel glass-panel summary">
-                <h2>Resumo Financeiro</h2>
-                <div class="result-item">
-                    <span>Custo de Produção</span>
-                    <span id="resCusto">R$ 0,00</span>
-                </div>
-                <div class="result-item" style="color: var(--accent);">
-                    <span>Lucro Líquido</span>
-                    <span id="resLucro" style="font-weight: 600; font-size: 1.25rem;">R$ 0,00</span>
-                </div>
-                <div class="result-total highlight-total">
-                    <span>Preço Sugerido (Venda)</span>
-                    <span id="resVenda">R$ 0,00</span>
-                </div>
+<div class="container">
 
-                <div class="footer-note"
-                    style="margin-top: 3rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-                    <p style="margin-bottom: 0.5rem;">Estratégia MEI: Acabamento Premium & Peças Exclusivas.</p>
-                    <p>#3DPrinting #BambuLabA1 #Max3DStudio</p>
-                </div>
-            </section>
-        </main>
+  <!-- DADOS DA IMPRESSÃO -->
+  <div class="card">
+    <div class="card-title"><span class="icon">📦</span> Dados da Impressão</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Peso da Peça (g)</label>
+        <input type="number" id="peso" value="0" min="0" step="0.1" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Tempo de Impressão (h)</label>
+        <input type="number" id="tempo" value="0" min="0" step="0.1" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Preço do Filamento (R$/kg)</label>
+        <input type="number" id="filamento" value="0" min="0" step="0.01" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Acessórios / Embalagem (R$)</label>
+        <input type="number" id="acessorios" value="0" min="0" step="0.01" oninput="calcular()" />
+      </div>
     </div>
-    <script src="script.js"></script>
-</body>
+  </div>
 
+  <!-- PARÂMETROS OPERACIONAIS -->
+  <div class="card">
+    <div class="card-title"><span class="icon">⚙️</span> Parâmetros Operacionais</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Custo Hora Impressora (R$/h)</label>
+        <input type="number" id="custoHora" value="1.5" min="0" step="0.01" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Consumo Energia (Watts)</label>
+        <input type="number" id="watts" value="150" min="0" step="1" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Taxa de Energia (R$/kWh)</label>
+        <input type="number" id="kwh" value="0.85" min="0" step="0.01" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Margem de Lucro (%)</label>
+        <input type="number" id="margem" value="100" min="0" step="1" oninput="calcular()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVISÃO POR PRODUTO -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🗂️</span> Divisão por Produto</div>
+
+    <div class="products-list" id="productsList"></div>
+    <button class="btn-add" onclick="addProduct()">+ ADICIONAR PRODUTO</button>
+
+    <div class="split-info" id="splitInfo" style="display:none; margin-top:14px;">
+      <div id="splitRows"></div>
+    </div>
+  </div>
+
+  <!-- RESUMO FINANCEIRO -->
+  <div class="card">
+    <div class="card-title"><span class="icon">💰</span> Resumo Financeiro (Total)</div>
+    <div class="results">
+      <div class="result-box">
+        <div class="result-label">Custo de Produção</div>
+        <div class="result-value" id="custoProd">R$ 0,00</div>
+      </div>
+      <div class="result-box profit">
+        <div class="result-label">Lucro Líquido</div>
+        <div class="result-value" id="lucro">R$ 0,00</div>
+      </div>
+      <div class="result-box highlight">
+        <div class="result-label">Preço Sugerido</div>
+        <div class="result-value" id="precoFinal">R$ 0,00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-tag">Estratégia MEI · Acabamento Premium & Peças Exclusivas · #3DPrinting #BambuLabA1</div>
+</div>
+
+<script>
+  let products = [];
+  let productCounter = 0;
+
+  function addProduct() {
+    const id = ++productCounter;
+    products.push({ id, nome: `Produto ${id}`, qty: 1 });
+    renderProducts();
+    calcular();
+  }
+
+  function removeProduct(id) {
+    products = products.filter(p => p.id !== id);
+    calcular();
+    renderProducts();
+  }
+
+  function renderProducts() {
+    const list = document.getElementById('productsList');
+    list.innerHTML = '';
+    products.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'product-row';
+      row.innerHTML = `
+        <div class="field">
+          ${i === 0 ? '<label>Nome do Produto</label>' : '<label>&nbsp;</label>'}
+          <input type="text"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1rem;width:100%;"
+            value="${p.nome}"
+            oninput="updateName(${p.id}, this.value)"
+            placeholder="Nome do produto" />
+        </div>
+        <div class="field">
+          ${i === 0 ? '<label>Quantidade</label>' : '<label>&nbsp;</label>'}
+          <input type="number" min="1" value="${p.qty}"
+            oninput="updateQty(${p.id}, this.value)"
+            style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:1rem;width:100%;-moz-appearance:textfield;" />
+        </div>
+        <div class="field">
+          ${i === 0 ? '<label>&nbsp;</label>' : '<label>&nbsp;</label>'}
+          <button class="btn-remove" onclick="removeProduct(${p.id})">✕</button>
+        </div>`;
+      list.appendChild(row);
+    });
+  }
+
+  function updateName(id, val) {
+    const p = products.find(p => p.id === id);
+    if (p) { p.nome = val; calcular(); }
+  }
+
+  function updateQty(id, val) {
+    const p = products.find(p => p.id === id);
+    if (p) { p.qty = Math.max(1, parseInt(val) || 1); calcular(); }
+  }
+
+  function fmt(v) {
+    return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  function calcular() {
+    const peso      = parseFloat(document.getElementById('peso').value)      || 0;
+    const tempo     = parseFloat(document.getElementById('tempo').value)     || 0;
+    const filamento = parseFloat(document.getElementById('filamento').value) || 0;
+    const acessorios= parseFloat(document.getElementById('acessorios').value)|| 0;
+    const custoHora = parseFloat(document.getElementById('custoHora').value) || 0;
+    const watts     = parseFloat(document.getElementById('watts').value)     || 0;
+    const kwh       = parseFloat(document.getElementById('kwh').value)       || 0;
+    const margem    = parseFloat(document.getElementById('margem').value)    || 0;
+
+    const custoFilamento = (peso / 1000) * filamento;
+    const custoEnergia   = (watts / 1000) * tempo * kwh;
+    const custoMaquina   = custoHora * tempo;
+    const custoProd      = custoFilamento + custoEnergia + custoMaquina + acessorios;
+    const lucro          = custoProd * (margem / 100);
+    const precoFinal     = custoProd + lucro;
+
+    document.getElementById('custoProd').textContent  = fmt(custoProd);
+    document.getElementById('lucro').textContent      = fmt(lucro);
+    document.getElementById('precoFinal').textContent = fmt(precoFinal);
+
+    // Split
+    const splitInfo = document.getElementById('splitInfo');
+    const splitRows = document.getElementById('splitRows');
+
+    if (products.length === 0) {
+      splitInfo.style.display = 'none';
+      return;
+    }
+
+    const totalQty = products.reduce((s, p) => s + p.qty, 0);
+
+    if (totalQty === 0) { splitInfo.style.display = 'none'; return; }
+
+    splitInfo.style.display = 'block';
+
+    let html = '';
+    products.forEach(p => {
+      const share      = p.qty / totalQty;
+      const prodCusto  = custoProd * share;
+      const prodLucro  = prodCusto * (margem / 100);
+      const prodVenda  = prodCusto + prodLucro;
+      const unitVenda  = prodVenda / p.qty;
+
+      html += `
+        <div class="split-info-row">
+          <span class="pname">${p.nome} <span style="color:var(--muted);font-size:0.8em">(×${p.qty})</span></span>
+          <span class="pval">
+            <span style="color:var(--muted);font-size:0.8em;margin-right:8px">Total: ${fmt(prodVenda)}</span>
+            Unitário: ${fmt(unitVenda)}
+          </span>
+        </div>`;
+    });
+
+    if (products.length > 1) {
+      html += `
+        <div class="split-info-row" style="margin-top:4px;padding-top:8px;border-top:1px solid var(--accent) !important;">
+          <span class="pname" style="color:var(--accent)">TOTAL GERAL (${totalQty} un.)</span>
+          <span class="pval" style="color:var(--green)">${fmt(precoFinal)}</span>
+        </div>`;
+    }
+
+    splitRows.innerHTML = html;
+  }
+
+  // Init
+  calcular();
+</script>
+</body>
 </html>
